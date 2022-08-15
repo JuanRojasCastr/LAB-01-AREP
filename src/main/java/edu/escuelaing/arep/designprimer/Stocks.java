@@ -12,6 +12,12 @@ public class Stocks {
     private static final String USER_AGENT = "Mozilla/5.0";
     private static final String GET_URL = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=NAME&interval=60min&apikey=WBHE8DSX66S276FV";
 
+    /**
+     *
+     * @param name name of the equity to search
+     * @return returns historical intraday stocks
+     * @throws IOException
+     */
     public static String getStock(String name) throws IOException {
 
         String tempURL = GET_URL.replace("NAME", name);
@@ -36,9 +42,6 @@ public class Stocks {
                 response.append(inputLine);
             }
             in.close();
-
-            // print result
-            System.out.println(response.toString());
 
             return response.toString();
         } else {

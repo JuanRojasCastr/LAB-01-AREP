@@ -5,18 +5,26 @@ public class SparkWebApp {
 
     public static void main(String[] args) {
         port(getPort());
-        get("/hello", (req, res) -> "Hello Heroku");
-        get("/stock", "application/json", (req,res) -> {
+        staticFiles.location("/public");
+        get("/hello", (req, res) -> {
+            String resp = req.queryParams("name");
+            return "Hello " + resp;
+        });
+        get("/stock", (req,res) -> {
             String name = req.queryParams("name");
             return Stocks.getStock(name);
         });
     }
 
+    /**
+     *
+     * @return default port if heroku-port isn't set
+     */
     static int getPort() {
         if (System.getenv("PORT") != null) {
             return Integer.parseInt(System.getenv("PORT"));
         }
-        return 4567; //returns default port if heroku-port isn't set (i.e. on localhost)
+        return 4567;
 
     }
 }
