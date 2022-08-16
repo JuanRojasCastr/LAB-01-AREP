@@ -27,21 +27,31 @@
           </table>
 
           <script>
+                    let cache = {};
 
 
                     function loadGetMsg() {
                               let nameVar = document.getElementById("name").value;
-                              const xhttp = new XMLHttpRequest();
-                              xhttp.onload = function() {
-                                        // document.getElementById("getrespmsg").innerHTML = this.responseText;
-                                        buildTable(JSON.parse(this.responseText));
-                                        buildCard(JSON.parse(this.responseText));
+                              if ( nameVar in cache ) {
+                                        console.log("CACHE");
+                                        buildTable(cache[nameVar]);
+                                        buildCard(cache[nameVar]);
                               }
-                              xhttp.open("GET", "/stock?name="+nameVar);
-                              xhttp.send();
+                              else {
+                                        const xhttp = new XMLHttpRequest();
+                                        xhttp.onload = function() {
+                                                  // document.getElementById("getrespmsg").innerHTML = this.responseText;
+                                                  cache[nameVar] = JSON.parse(this.responseText);
+                                                  buildTable(JSON.parse(this.responseText));
+                                                  buildCard(JSON.parse(this.responseText));
+                                        }
+                                        xhttp.open("GET", "/stock?name="+nameVar);
+                                        xhttp.send();
+                              }
                     }
 
                     function buildTable(json){
+                              cleanElements([...document.getElementsByClassName("row")]);
                               let table = document.getElementById("myTable");
                               table.style.display = "";
                               let mainData =  json["Time Series (Daily)"];
@@ -51,7 +61,7 @@
                                         for(data in keyData){
                                                   dataArray.push(keyData[data]);
                                         }
-                                        let row = `<tr>
+                                        let row = `<tr class="row">
                                                                       <td>${key}</td>
                                                                       <td>${dataArray[0]}</td>
                                                                       <td>${dataArray[1]}</td>
@@ -59,12 +69,12 @@
                                                                       <td>${dataArray[3]}</td>
                                                                       <td>${dataArray[4]}</td>
                                                             </tr>`
-                                        
                                         table.innerHTML += row;
                               }
                     }
                     function buildCard(json){
                               let card = document.getElementById("getrespmsg");
+                              cleanElements([...card.children]);
                               card.style.display = "";
                               let mainData =  json["Meta Data"];
                               let dataArray = [];
@@ -79,6 +89,13 @@
                                                   <p>Time Zone: ${dataArray[4]}</p>`
                               
                               card.innerHTML += cardHTML;
+                    }
+                    function cleanElements(elements) {
+                              if(elements.length > 0) {
+                                        for(element of elements){
+                                                  element.remove();
+                                        };
+                              }
                     }
           </script>
 
