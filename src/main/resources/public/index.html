@@ -82,7 +82,7 @@
                                                   if(nameVar2 == "0")  buildCard(JSON.parse(this.responseText))
                                                   else document.getElementById("getrespmsg").style.display = "none";
                                         }
-                                        xhr.onloadend = function() {
+                                        xhttp.onloadend = function() {
                                             if(xhr.status == 404)
                                                 loadGetMsg();
                                         }
