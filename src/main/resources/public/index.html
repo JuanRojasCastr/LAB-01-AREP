@@ -82,6 +82,10 @@
                                                   if(nameVar2 == "0")  buildCard(JSON.parse(this.responseText))
                                                   else document.getElementById("getrespmsg").style.display = "none";
                                         }
+                                        xhr.onloadend = function() {
+                                            if(xhr.status == 404)
+                                                loadGetMsg();
+                                        }
                                         xhttp.open("GET", "/stock?name="+nameVar+"&provider="+nameVar2+"&time="+nameVar3);
                                         xhttp.send();
                               }
