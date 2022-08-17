@@ -11,6 +11,21 @@
           <form action="/stock">
                     <label for="name">Name:</label><br>
                     <input type="text" id="name" name="name" value="IBM"><br><br>
+                    <label>Select service provider:</label><br>
+                    <select id="provider" name="select">
+                              <option value="0" selected>Alpha Vantage</option>
+                              <option value="1" >Polygon</option>
+                    </select><br><br>
+                    <div id="time-config">
+                              <label>Select time interval:</label><br>
+                              <select id="option" name="select2">
+                                        <option value="INTRADAY" selected>Intraday</option>
+                                        <option value="DAILY" >Daily</option>
+                                        <option value="WEEKLY" >Weekly</option>
+                                        <option value="MONTHLY" >Monthly</option>
+                              </select>
+                    </div>
+                   <br><br>
                     <input type="button" value="Submit" onclick="loadGetMsg()">
           </form>
           <div id="getrespmsg" class="card" style="display: none">
@@ -29,23 +44,45 @@
           <script>
                     let cache = {};
 
+                    const MAX = 200;
+
+                    let selectProvider= document.getElementById("provider");
+                    let selectConfig = document.getElementById('time-config');
+
+                    selectProvider.addEventListener('change', (event) => {
+                              if (selectProvider.value == "0") { 
+                                        selectConfig.style.display = "";
+                              } else selectConfig.style.display = "none";
+                    })
 
                     function loadGetMsg() {
                               let nameVar = document.getElementById("name").value;
-                              if ( nameVar in cache ) {
+                              let nameVar2 = selectProvider.value;
+                              let nameVar3 = document.getElementById("option").value;
+                              let tempName = nameVar + nameVar2;
+                              
+                              if ( tempName  in cache || tempName + nameVar3 in cache) {
                                         console.log("CACHE");
-                                        buildTable(cache[nameVar]);
-                                        buildCard(cache[nameVar]);
+                                        if(nameVar2 == "0") {
+                                                  buildCard(cache[tempName + nameVar3]);
+                                                  buildTable(cache[tempName + nameVar3]);
+                                        }
+                                        else {
+                                                  buildTable(cache[tempName]);
+                                                  document.getElementById("getrespmsg").style.display = "none"
+                                        };
                               }
                               else {
                                         const xhttp = new XMLHttpRequest();
                                         xhttp.onload = function() {
                                                   // document.getElementById("getrespmsg").innerHTML = this.responseText;
-                                                  cache[nameVar] = JSON.parse(this.responseText);
+                                                  if(nameVar2 == "1") cache[nameVar + nameVar2] = JSON.parse(this.responseText);
+                                                  if(nameVar2 == "0") cache[nameVar + nameVar2 + nameVar3] = JSON.parse(this.responseText);
                                                   buildTable(JSON.parse(this.responseText));
-                                                  buildCard(JSON.parse(this.responseText));
+                                                  if(nameVar2 == "0")  buildCard(JSON.parse(this.responseText))
+                                                  else document.getElementById("getrespmsg").style.display = "none";
                                         }
-                                        xhttp.open("GET", "/stock?name="+nameVar);
+                                        xhttp.open("GET", "/stock?name="+nameVar+"&provider="+nameVar2+"&time="+nameVar3);
                                         xhttp.send();
                               }
                     }
@@ -54,39 +91,49 @@
                               cleanElements([...document.getElementsByClassName("row")]);
                               let table = document.getElementById("myTable");
                               table.style.display = "";
-                              let mainData =  json["Time Series (Daily)"];
-                              for(key in mainData){
-                                        let keyData = mainData[key];
-                                        let dataArray = [];
-                                        for(data in keyData){
-                                                  dataArray.push(keyData[data]);
-                                        }
-                                        let row = `<tr class="row">
-                                                                      <td>${key}</td>
-                                                                      <td>${dataArray[0]}</td>
-                                                                      <td>${dataArray[1]}</td>
-                                                                      <td>${dataArray[2]}</td>
-                                                                      <td>${dataArray[3]}</td>
-                                                                      <td>${dataArray[4]}</td>
-                                                            </tr>`
-                                        table.innerHTML += row;
+                              switch (selectProvider.value) {
+                                        case "0":
+                                                  let mainData =  json[Object.keys(json)[1]];
+                                                  let num = 0;
+                                                  for(key in mainData){
+                                                            let row = `<tr class="row">
+                                                                                          <td>${key}</td>
+                                                                                          <td>${mainData[key]["1. open"]}</td>
+                                                                                          <td>${mainData[key]["2. high"]}</td>
+                                                                                          <td>${mainData[key]["3. low"]}</td>
+                                                                                          <td>${mainData[key]["4. close"]}</td>
+                                                                                          <td>${mainData[key]["5. volume"]}</td>
+                                                                                </tr>`
+                                                            table.innerHTML += row;
+                                                            num++;
+                                                            if (num > MAX) break;
+                                                  }
+                                                  break;
+                                        case "1":
+                                                  let row = `<tr class="row">
+                                                                                <td>${json.from}</td>
+                                                                                <td>${json.open}</td>
+                                                                                <td>${json.high}</td>
+                                                                                <td>${json.low}</td>
+                                                                                <td>${json.close}</td>
+                                                                                <td>${json.volume}</td>
+                                                                      </tr>`
+                                                  table.innerHTML += row;
+                                                  break;
+                                        default:
+                                                  break;
                               }
                     }
                     function buildCard(json){
                               let card = document.getElementById("getrespmsg");
                               cleanElements([...card.children]);
-                              card.style.display = "";
+                              card.style.display = "" ;
                               let mainData =  json["Meta Data"];
-                              let dataArray = [];
-                              for(key in mainData){
-                                        dataArray.push(mainData[key]);
-                              }
                               let table = document.getElementById("myTable");
                               let cardHTML = `<h4>General Info</h4>
-                                                  <p>Symbol: ${dataArray[1]}</p>
-                                                  <p>Last Refreshed: ${dataArray[2]}</p>
-                                                  <p>Output Size: ${dataArray[3]}</p>
-                                                  <p>Time Zone: ${dataArray[4]}</p>`
+                                                  <p>Information: ${mainData["1. Information"]}</p>
+                                                  <p>Symbol: ${mainData["2. Symbol"]}</p>
+                                                  <p>Last Refreshed: ${mainData["3. Last Refreshed"]}</p>`
                               
                               card.innerHTML += cardHTML;
                     }

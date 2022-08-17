@@ -6,17 +6,15 @@ public class SparkWebApp {
     public static void main(String[] args) {
         port(getPort());
         staticFiles.location("/public");
-        get("/hello", (req, res) -> {
-            String resp = req.queryParams("name");
-            return "Hello " + resp;
-        });
         get("/stock", (req,res) -> {
             String name = req.queryParams("name");
-            return Stocks.getStock(name);
+            String time = req.queryParams("time");
+            int provider = Integer.parseInt(req.queryParams("provider"));
+            return Stocks.getStock(name, time, provider);
         });
     }
 
-    /**
+    /**-
      *
      * @return default port if heroku-port isn't set
      */

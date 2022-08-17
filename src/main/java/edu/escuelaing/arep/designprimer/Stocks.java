@@ -1,26 +1,44 @@
 package edu.escuelaing.arep.designprimer;
 
+import org.apache.commons.lang3.time.DateUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Stocks {
 
     private static final String USER_AGENT = "Mozilla/5.0";
-    private static final String GET_URL = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=NAME&interval=60min&apikey=WBHE8DSX66S276FV";
 
     /**
      *
      * @param name name of the equity to search
+     * @param provider number of the service provider
+     * @param time temporal resolution of the equity
      * @return returns historical intraday stocks
      * @throws IOException
      */
-    public static String getStock(String name) throws IOException {
+    public static String getStock(String name, String time, int provider) throws IOException {
 
-        String tempURL = GET_URL.replace("NAME", name);
+
+        ServiceConfig config = new ServiceConfig();
+        String GET_URL = config.getService(provider);
+
+        String tempURL = GET_URL.replace("$NAME", name);
+
+        if (provider == 1) {
+            Date date = DateUtils.addDays(new Date(), -1);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            tempURL = tempURL.replace("$DATE", sdf.format(date));
+        }
+        else if (provider == 0) {
+            tempURL = tempURL.replace("$TIME", time);
+        }
 
         URL obj = new URL(tempURL);
 
