@@ -83,7 +83,7 @@
                                                   else document.getElementById("getrespmsg").style.display = "none";
                                         }
                                         xhttp.onloadend = function() {
-                                            if(xhr.status == 404)
+                                            if(xhttp.status == 404)
                                                 loadGetMsg();
                                         }
                                         xhttp.open("GET", "/stock?name="+nameVar+"&provider="+nameVar2+"&time="+nameVar3);
