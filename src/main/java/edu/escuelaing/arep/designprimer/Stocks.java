@@ -63,7 +63,16 @@ public class Stocks {
 
             return response.toString();
         } else {
-            System.out.println("GET request not worked");
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                    con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            System.out.println("GET request not worked: " + response);
         }
         System.out.println("GET DONE");
 
