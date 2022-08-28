@@ -42,8 +42,6 @@
           </table>
 
           <script>
-                    let cache = {};
-
                     const MAX = 200;
 
                     let selectProvider= document.getElementById("provider");
@@ -59,36 +57,20 @@
                               let nameVar = document.getElementById("name").value;
                               let nameVar2 = selectProvider.value;
                               let nameVar3 = document.getElementById("option").value;
-                              let tempName = nameVar + nameVar2;
-                              
-                              if ( tempName  in cache || tempName + nameVar3 in cache) {
-                                        console.log("CACHE");
-                                        if(nameVar2 == "0") {
-                                                  buildCard(cache[tempName + nameVar3]);
-                                                  buildTable(cache[tempName + nameVar3]);
-                                        }
-                                        else {
-                                                  buildTable(cache[tempName]);
-                                                  document.getElementById("getrespmsg").style.display = "none"
-                                        };
+
+                              const xhttp = new XMLHttpRequest();
+                              xhttp.onload = function() {
+                                        // document.getElementById("getrespmsg").innerHTML = this.responseText;
+                                        buildTable(JSON.parse(this.responseText));
+                                        if(nameVar2 == "0")  buildCard(JSON.parse(this.responseText))
+                                        else document.getElementById("getrespmsg").style.display = "none";
                               }
-                              else {
-                                        const xhttp = new XMLHttpRequest();
-                                        xhttp.onload = function() {
-                                                  // document.getElementById("getrespmsg").innerHTML = this.responseText;
-                                                  if(nameVar2 == "1") cache[nameVar + nameVar2] = JSON.parse(this.responseText);
-                                                  if(nameVar2 == "0") cache[nameVar + nameVar2 + nameVar3] = JSON.parse(this.responseText);
-                                                  buildTable(JSON.parse(this.responseText));
-                                                  if(nameVar2 == "0")  buildCard(JSON.parse(this.responseText))
-                                                  else document.getElementById("getrespmsg").style.display = "none";
-                                        }
-                                        xhttp.onloadend = function() {
-                                            if(xhttp.status == 404)
-                                                loadGetMsg();
-                                        }
-                                        xhttp.open("GET", "/stock?name="+nameVar+"&provider="+nameVar2+"&time="+nameVar3);
-                                        xhttp.send();
+                              xhttp.onloadend = function() {
+                                        if(xhttp.status == 404)
+                                        loadGetMsg();
                               }
+                              xhttp.open("GET", "/stock?name="+nameVar+"&provider="+nameVar2+"&time="+nameVar3);
+                              xhttp.send();
                     }
 
                     function buildTable(json){
