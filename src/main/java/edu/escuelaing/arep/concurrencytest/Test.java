@@ -12,7 +12,7 @@ public class Test {
     public static void main(String[] args) throws IOException {
         int nThreads = 5; // Alpha Vantage standard API call frequency is 5 calls per minute
 
-        Date date = DateUtils.addDays(new Date(), -1);
+        Date date = DateUtils.addDays(new Date(), -2);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
         ArrayList<RequestThread> concurrencyConect = new ArrayList<>();
@@ -30,7 +30,7 @@ public class Test {
             }
         }
         if (okRequest == nThreads) {
-            System.out.println("Respuesta correcta");
+            System.out.println("Correct answer");
         }
         else System.out.println("Something went wrong, maybe api calls per minute reached");
     }
