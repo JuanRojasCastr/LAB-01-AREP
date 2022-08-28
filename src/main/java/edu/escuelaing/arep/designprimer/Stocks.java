@@ -34,6 +34,7 @@ public class Stocks {
         if (provider == 1) {
             Date date = DateUtils.addDays(new Date(), -1);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            System.out.println(sdf.format(date));
             tempURL = tempURL.replace("$DATE", sdf.format(date));
         }
         else if (provider == 0) {
