@@ -32,7 +32,7 @@ public class Stocks {
         String tempURL = GET_URL.replace("$NAME", name);
 
         if (provider == 1) {
-            Date date = DateUtils.addDays(new Date(), -2);
+            Date date = DateUtils.addDays(new Date(), -3);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             tempURL = tempURL.replace("$DATE", sdf.format(date));
         }
